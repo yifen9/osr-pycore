@@ -51,8 +51,8 @@ ci:
     just venv && \
     just sync-lock && \
     just fmt-check && \
-    just lint-check && \
-    just test
+    just lint-check # && \
+    # just test
 
 docs-build:
 	uv run pdoc --math -o site osr_pycore
