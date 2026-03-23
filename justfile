@@ -51,7 +51,7 @@ ci:
     just venv && \
     just sync-lock && \
     just fmt-check && \
-    just lint-check && \
+    just lint-check # && \
     # just test
 
 docs-build:
