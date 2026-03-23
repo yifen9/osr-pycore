@@ -4,7 +4,7 @@ import json
 import time
 from dataclasses import dataclass
 
-from te_net_examples.utils.logger import Logger
+from osr_pycore.utils.logger import Logger
 
 
 @dataclass(slots=True)

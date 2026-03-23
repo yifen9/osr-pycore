@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Callable
 
-from te_net_examples.utils.message import Level, Message, make_message
+from osr_pycore.utils.message import Level, Message, make_message
 
 
 Sink = Callable[[Message], None]

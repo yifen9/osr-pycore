@@ -7,12 +7,12 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from te_net_examples.utils.audit import Audit
-from te_net_examples.utils.console import ConsoleSink
-from te_net_examples.utils.jlog import jline
-from te_net_examples.utils.logger import Logger
-from te_net_examples.utils.meta import build_meta
-from te_net_examples.utils.versioner import build_version_dir
+from osr_pycore.utils.audit import Audit
+from osr_pycore.utils.console import ConsoleSink
+from osr_pycore.utils.jlog import jline
+from osr_pycore.utils.logger import Logger
+from osr_pycore.utils.meta import build_meta
+from osr_pycore.utils.versioner import build_version_dir
 
 
 @dataclass(frozen=True, slots=True)

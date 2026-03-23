@@ -16,7 +16,7 @@ from rich.progress import (
     TimeRemainingColumn,
 )
 
-from te_net_examples.utils.message import Message
+from osr_pycore.utils.message import Message
 
 
 def _hhmmss(ts: str) -> str:

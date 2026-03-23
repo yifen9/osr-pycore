@@ -4,7 +4,7 @@ import os
 from dataclasses import dataclass
 from typing import Any
 
-from te_net_examples.io.json import read_json
+from osr_pycore.io.json import read_json
 
 
 @dataclass(slots=True)

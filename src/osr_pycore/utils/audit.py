@@ -6,9 +6,9 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Any
 
-from te_net_examples.io.json import write_json
-from te_net_examples.io.jsonl import append_jsonl
-from te_net_examples.utils.message import Message
+from osr_pycore.io.json import write_json
+from osr_pycore.io.jsonl import append_jsonl
+from osr_pycore.utils.message import Message
 
 
 def _utc_now() -> str:

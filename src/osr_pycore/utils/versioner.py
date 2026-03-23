@@ -4,7 +4,7 @@ import os
 from datetime import datetime
 from typing import Any
 
-from te_net_examples.io.json import read_json, write_json
+from osr_pycore.io.json import read_json, write_json
 
 
 def _dir_ts(ts: str) -> str:
