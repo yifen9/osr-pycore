@@ -47,20 +47,24 @@ def _require_dir(path: str) -> str:
     return os.path.abspath(path)
 
 
+def _require_dirs(paths: list[str]) -> list[str]:
+    return [_require_dir(path) for path in paths]
+
+
 def create_source_meta_run(
     *,
-    root_dir: str,
+    upstreams: list[str],
     input_dir: str,
     output_root: str,
-    src_dir: str,
+    src: str,
     script_path: str,
     source_name: str,
     component: str,
 ) -> SourceMetaOut:
-    root_dir = _require_dir(root_dir)
+    upstreams = _require_dirs(upstreams)
     input_dir = _require_dir(input_dir)
     output_root = os.path.abspath(output_root)
-    src_dir = _require_dir(src_dir)
+    src = _require_dir(src)
     script_path = _require_file(script_path)
 
     source_path = _require_file(os.path.join(input_dir, source_name))
@@ -70,7 +74,7 @@ def create_source_meta_run(
 
     params: dict[str, Any] = {
         "component": component,
-        "root_dir": root_dir,
+        "upstreams": upstreams,
         "input_dir": input_dir,
         "output_root": output_root,
         "source_name": source_name,
@@ -81,7 +85,7 @@ def create_source_meta_run(
         env=env_path,
         script=script_path,
         cfg=source_path,
-        src=src_dir,
+        src=src,
     )
 
     run_dir = build_version_dir(output_root, meta)
@@ -90,7 +94,8 @@ def create_source_meta_run(
 
     try:
         logger.info(jline("stage", component, "start", run_dir=run_dir))
-        logger.info(jline("input", component, "root_dir", path=root_dir))
+        for upstream in upstreams:
+            logger.info(jline("input", component, "upstream", path=upstream))
         logger.info(jline("input", component, "input_dir", path=input_dir))
         logger.info(jline("input", component, "source_yaml", path=source_path))
 
@@ -107,22 +112,22 @@ def create_source_meta_run(
 
 def _build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(prog="source_meta")
-    p.add_argument("root_dir")
+    p.add_argument("src")
     p.add_argument("input_dir")
     p.add_argument("output_root")
-    p.add_argument("src_dir")
-    p.add_argument("--source-name", default="SOURCE.yaml")
-    p.add_argument("--component")
+    p.add_argument("source_name")
+    p.add_argument("component")
+    p.add_argument("upstreams", nargs="+")
     return p
 
 
 def main(argv: list[str] | None = None) -> int:
     ns = _build_parser().parse_args(argv)
     out = create_source_meta_run(
-        root_dir=ns.root_dir,
+        upstreams=ns.upstreams,
         input_dir=ns.input_dir,
         output_root=ns.output_root,
-        src_dir=ns.src_dir,
+        src=ns.src,
         script_path=str(Path(__file__).resolve()),
         source_name=ns.source_name,
         component=ns.component,
