@@ -38,17 +38,18 @@ def _repo_root_from_path(p: Path) -> Path:
 def _require_file(path: str) -> str:
     if not os.path.isfile(path):
         raise FileNotFoundError(path)
-    return path
+    return os.path.abspath(path)
 
 
 def _require_dir(path: str) -> str:
     if not os.path.isdir(path):
         raise FileNotFoundError(path)
-    return path
+    return os.path.abspath(path)
 
 
 def create_source_meta_run(
     *,
+    root_dir: str,
     input_dir: str,
     output_root: str,
     src_dir: str,
@@ -56,37 +57,41 @@ def create_source_meta_run(
     source_name: str,
     component: str,
 ) -> SourceMetaOut:
+    root_dir = _require_dir(root_dir)
     input_dir = _require_dir(input_dir)
+    output_root = os.path.abspath(output_root)
     src_dir = _require_dir(src_dir)
-    output_root_abs = os.path.abspath(output_root)
+    script_path = _require_file(script_path)
 
     source_path = _require_file(os.path.join(input_dir, source_name))
-    script_path_abs = _require_file(os.path.abspath(script_path))
 
-    repo_root = _repo_root_from_path(Path(script_path_abs))
+    repo_root = _repo_root_from_path(Path(script_path))
     env_path = _require_file(str(repo_root / "uv.lock"))
 
     params: dict[str, Any] = {
         "component": component,
-        "input_dir": os.path.abspath(input_dir),
-        "output_root": output_root_abs,
-        "source_file": source_name,
+        "root_dir": root_dir,
+        "input_dir": input_dir,
+        "output_root": output_root,
+        "source_name": source_name,
     }
 
     meta = build_meta(
         params=params,
         env=env_path,
-        script=script_path_abs,
+        script=script_path,
         cfg=source_path,
         src=src_dir,
     )
 
-    run_dir = build_version_dir(output_root_abs, meta)
+    run_dir = build_version_dir(output_root, meta)
     audit = Audit.create(run_dir, meta)
     logger = Logger(sinks=[ConsoleSink(), audit])
 
     try:
         logger.info(jline("stage", component, "start", run_dir=run_dir))
+        logger.info(jline("input", component, "root_dir", path=root_dir))
+        logger.info(jline("input", component, "input_dir", path=input_dir))
         logger.info(jline("input", component, "source_yaml", path=source_path))
 
         dst = os.path.join(run_dir, source_name)
@@ -102,17 +107,19 @@ def create_source_meta_run(
 
 def _build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(prog="source_meta")
+    p.add_argument("root_dir")
     p.add_argument("input_dir")
     p.add_argument("output_root")
     p.add_argument("src_dir")
     p.add_argument("--source-name", default="SOURCE.yaml")
-    p.add_argument("--component", default="qf/01_meta")
+    p.add_argument("--component")
     return p
 
 
 def main(argv: list[str] | None = None) -> int:
     ns = _build_parser().parse_args(argv)
     out = create_source_meta_run(
+        root_dir=ns.root_dir,
         input_dir=ns.input_dir,
         output_root=ns.output_root,
         src_dir=ns.src_dir,
